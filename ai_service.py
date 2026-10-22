@@ -24,7 +24,7 @@ def ask_ai(prompt: str) -> str:
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
-            model="llama-3.3-70b-versatile",
+            model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
         )
         reply = chat_completion.choices[0].message.content
         return reply.strip() if reply else "I could not find an answer for that."

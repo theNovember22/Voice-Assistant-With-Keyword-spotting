@@ -14,11 +14,22 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Create a `.env` file in the project root:
+Create a file named `.env` in either the repository root or the `server` folder:
 
 ```env
 GROQ_API_KEY=your_real_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
 ```
+
+The backend checks both locations. Do not commit `.env`; it is already excluded by `.gitignore`.
+
+To verify configuration without exposing your key, open:
+
+```
+http://127.0.0.1:5000/api/health
+```
+
+You should see `"groq_configured": true`.
 
 ### Frontend
 
@@ -54,13 +65,14 @@ In Render:
    - Runtime: `Python 3`
    - Build Command: `pip install -r requirements.txt`
    - Start Command: `gunicorn app:app`
-5. Add environment variable:
+5. Add the environment variable in Render's Environment settings:
 
 ```text
 GROQ_API_KEY=your_real_groq_api_key_here
 ```
 
 6. Deploy it
+7. Open `https://your-backend.onrender.com/api/health`; it must report `"groq_configured": true`
 
 After deploy, copy the backend URL, for example:
 
@@ -93,4 +105,4 @@ Your public résumé link will be the frontend static-site URL.
 - Open the deployed frontend over HTTPS and click `Start Voice Mode` once so the browser can request microphone/audio permission.
 - After that: say `Maya`, then commands like `what is the time`, `what is 12 times 5`, `play senorita`, or `goodbye`.
 - If a command is not one of Maya's built-in actions, it is sent to Groq for a general answer.
-- `client/.env.example` shows the production frontend environment variable you need on Render.
+- `/api/health` confirms whether the backend can see a Groq key without revealing it.

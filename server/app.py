@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import sys
 import re
+import os
 
 from flask_cors import CORS
 from flask import Flask, jsonify, request
@@ -10,7 +11,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 import calculator
 import musicLibrary
-from ai_service import ask_ai
+from ai_service import ask_ai, is_groq_configured
 
 
 app = Flask(__name__)
@@ -46,10 +47,18 @@ def generate_response(message: str) -> dict:
     if "thank" in normalized:
         return {"reply": "You're welcome. Keep going."}
 
-    # ---------- AI fallback ----------
-    # If the command is not one of Maya's built-in actions,
-    # send it to Groq for a general answer.
     return {"reply": ask_ai(message)}
+
+
+@app.get("/api/health")
+def health():
+    return jsonify(
+        {
+            "status": "ok",
+            "groq_configured": is_groq_configured(),
+            "groq_model": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+        }
+    )
 
 
 @app.post("/api/chat")
